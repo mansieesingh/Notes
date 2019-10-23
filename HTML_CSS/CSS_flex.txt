@@ -1,0 +1,66 @@
+<div  class="container"> 
+  <div class="dropdown">
+    <select>
+      <option>Car</option>
+      <option>Bus</option>
+    </select>
+  </div>
+  <div class="dropdown">
+    <select>
+      <option>Volvo</option>
+      <option>Audi</option>
+    </select>
+  </div>
+  <div class="dropdown2">
+    <select>
+      <option>Apple</option>
+      <option>Orange</option>
+    </select>
+  </div>
+  <!--<div class="dropdown">
+    <select>
+      <option>Indigo</option>
+      <option>Purple</option>
+    </select>
+  </div>
+  <div class="dropdown">
+    <select>
+      <option>Vanila</option>
+      <option>Butterscotch</option>
+    </select>
+  </div>
+-->
+</div>
+
+
+====================
+
+.container {
+  height:150px;
+  border: 2px solid red;
+  display: flex;
+  flex-direction: row;
+  /*flex-direction: column-reverse;*/
+  flex-wrap:wrap;
+  /*justify-content: center;*/
+  /*align-items: strech;*/
+  /*justify-content: space-between;*/
+  justify-content: space-around;
+  align-items: center;
+  
+}
+
+.dropdown{
+  margin: 5px;
+  padding: 30px;
+  width:200px;
+  flex: 2 1 10em;
+  border: 2px dotted red;
+}
+.dropdown2{
+  margin: 5px;
+  padding: 30px;
+  width:200px;
+  flex: 1 1 10em;
+  border: 2px dotted blue;
+}

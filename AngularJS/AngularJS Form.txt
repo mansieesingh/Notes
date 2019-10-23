@@ -1,0 +1,232 @@
+
+Client side validation in AngularJS 
+
+note: novalidate is used to disable browser's native validation
+----
+
+ 1- Using CSS Classes
+ 2- Validation tokens
+ 3- Directives
+
+Using CSS Classes
+------------------
+To allow styling of form as well as controls, ngModel adds these CSS classes:
+	1> ng-valid  :  is set if the form is valid.
+	2> ng-invalid : is set if the form is invalid.
+	3> ng-prestine:control hasn't been interacted been yet
+	4> ng-dirty : the control has been interacted with
+	5> ng-touched
+	6> ng-untouched
+	7> ng-pending : $asyncValidatiors are unfulfilled
+
+Built-in validation tokens:
+--------------------------
+
+email
+max
+maxlength
+min
+minlength
+number
+pattern
+required
+url
+date
+datetimelocal
+time
+week
+month
+
+Form
+
+FormController: it keeps track of all it's controls and nested forms as well as the state of them, such as being valid/invalid or dirty/prestine.
+Each form directive <ng-form> creates an instance of FormCOntroller.
+
+Methods
+--------
+$rollbackViewValue();
+$commitViewValue();
+$addControl(control);
+$getControls();
+$removeControl(control);
+$setDirty();
+$setPristine();
+$setUntouched();
+$setSubmitted();
+$setValidity(validationErrorKey, isValid, controller);
+
+Properties
+----------
+$pristine
+$dirty
+$valid
+$invalid
+$submitted
+$pending
+$error
+
+
+--------------Explaination of Methods-------------------------
+$setDirty(): Sets the form to a dirty state. This method CAN BE called to add the 'ng-dirty' class and set the form to a dirty state (ng-dirty class). This method will also propagate to parent forms.
+
+$setPristine():  Sets the form to its pristine state. This method sets the form's $pristine state to true, the $dirty state to false, removes the ng-dirty class and adds the ng-pristine class. Additionally, it sets the $submitted state to false.
+This method will also propagate to all the controls contained in this form.
+Setting a form back to a pristine state is often useful when we want to 'reuse' a form after saving or resetting it.
+
+$setUntouched(): Sets the form to its untouched state. This method CAN BE called to remove the 'ng-touched' class and set the form controls to their untouched state (ng-untouched class).
+Setting a form controls back to their untouched state is often useful when setting the form back to its pristine state.
+
+$setSubmitted():  Sets the form to its $submitted state. This will also set $submitted on all child and parent forms of the form.
+
+-------------------------------------------------------------
+
+form directive
+----------------
+
+It is directive that instantiates Formcontroller.If name attribute of this directive is specified then the form controller is publisdhes onto the current scope under this name.
+
+<form
+  [name="string"]>
+...
+</form>
+
+note: it can be used as an element
+
+Alias: ngForm
+In angularJS form can be nested, which means the outer form is valid when all inner chils forms are valid as well.
+However, browser does not allow nesting of <form> element, and therefore AngularJS provides ngForm directive, which behaves identically to form, but can be nested
+
+You can use one of the following ways to specify what javascript method shoud be called when a form is submitted:
+	1> ngSubmit - this directive is used on the form element.
+	2> ngClick - this directive used in the first button or input field of type submit (input[type=submit])
+
+**To prevent double execution of the handler, use only one of the ngSubmit or ngClick directives. This is because of the following form submission rules in the HTML specification:
+
+Form has:
+ (i)  1 input field -----then-----> hitting enter in this field -----triggers----> ngSubmit
+ (ii) 1 or more input field + 1 or more buttons -----then-----> 
+	hitting enter in input fields -----triggers----> 
+	click handler(ngClick) on the first button [OR] submit handler(ngSubmit) on the enclosing form 
+ (iii) 2 or more input field  only -----then-----> hitting enter in this field -----triggers----> NOTHING!!!
+
+
+ng-form directive
+------------------------------------------------------------------------------------------------------------------------
+
+Helper directive that makes it possible to create control groups inside a form directive. These "child forms" can be used, for example, to determine the validity of a sub-group of controls.
+
+Note: ngForm cannot be used as a replacement for <form>, because it lacks its built-in HTML functionality. Specifically, you cannot submit ngForm like a <form> tag. That means, you cannot send data to the server with ngForm, or integrate it with ngSubmit.
+
+Can be used as: 
+
+	element : <ng-form name:"string"></ng-form>
+	attribute  : <ANY ng-form="string"></ANY>
+	CSS class : <ANY class="ng-form:string"></ANY>
+
+
+AngularJS form validation
+------------------------------------------------------------------------------------------------------------------------
+
+1-  CSS Classes [added by ngModel]
+2-  Directives for validation (required, pattern, minlength, maxlength, min, max)
+3-  Properties ($prestine, $dirty, $valid, $invalid, $submitted, $error)
+4-  AngularJS directives: ng-requires, ng-pattern
+
+1-  CSS classes
+ng-valid is set if the form is valid.
+ng-invalid is set if the form is invalid.
+ng-pending is set if the form is pending.
+ng-pristine is set if the form is pristine.
+ng-dirty is set if the form is dirty.
+ng-submitted is set if the form was submitted.
+Keep in mind that ngAnimate can detect each of these classes when added and removed.
+
+	Lets see how we can use them. Usage:
+	In Form: myForm.$dirty
+	For Field: myForm.firldName.$dirty
+	In CSS:
+		.ng-dirty{
+ 		background-color: yellow;
+		}
+
+4- AngularJS directives: ng-required, ng-pattern, ng-
+
+ng-required
+-----------
+> It adds *required* "validator" to mgModel. 
+> This directive sets 'required' attribute on the element if AngularJS expression inside ng-required evaluates to true.
+> The validator will set the required error key to true if the required attribute is set and calling NgModelController.       $isEmpty [with the ngModel.$viewValue] returns true
+
+ng-pattern
+----------
+> It adds *pattern* "validator" to mgModel. 
+> Often used for text-based input controls.
+> The validator sets the pattern error key if the ngModel.$viewValue does not match a RegExp which is obtained from the  ngPattern attribute value.
+
+the value is an AngularJS expression:
+	-> If the expression evaluates to a RegExp object, then this is used directly.
+	-> If the expression evaluates to a string, then it will be converted to a RegExp after wrapping it in ^ and $ 		characters. For instance, "abc" will be converted to new RegExp('^abc$').
+	-> If the value is a RegExp literal, e.g. ngPattern="/^\d+$/", it is used directly.
+
+
+Usage:
+ 	<ANY ... ng-pattern="x"></ANY>
+x ==> Expression or regex , AngularJS expression that must evaluate to a RegExp or a String parsable into a RegExp, or a RegExp literal.
+
+============================Self Understanding==================================
+
+bolean type: $prestine, $dirty, $valid, $invalid, $submitted
+object type: $error 
+
+______________________________________________________________________________________________________________
+|	<!DOCTYPE html>
+|	<html>
+|	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>  
+|	<body ng-app="">
+|
+|
+|	<p> Enter in input field </p>
+|	<form name ="myForm">
+|	<input type="text" name="myInput" ng-model="myInput" ng-required=true>
+|	</form>
+|	<p> Error Object : <span style="color:red"> {{ myForm.myInput.$error }}</span></p>
+|	<p> $error.required : <span style="color:red"> {{ myForm.myInput.$error.required }}</span></p>
+|	<p> $valid state of input field is : <span style="color:red"> {{ myForm.myInput.$valid }}</span></p>
+|
+|	</body>
+|	</html>
+|______________________________________________________________________________________________________________
+
+OUTPUT [no input]
+------------------
+Enter in input field
+______________________
+|_____________________|
+
+Error Object : {"required":true}
+
+$error.required : true
+
+$valid state of input field is : false
+
+OUTPUT [with "asdf" input]
+------------------
+Enter in input field
+______________________
+|asdf_________________|
+
+Error Object : {}   //===> this indicates that error object is set to NULL for valid input
+
+$error.required :
+
+$valid state of input field is : true
+
+
+=========================================================================================================
+
+ng-Submit
+
+
+
+
+

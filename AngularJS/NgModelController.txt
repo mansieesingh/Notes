@@ -1,0 +1,22 @@
+ngModel.NgModelController
+******************************
+
+Overview
+NgModelController provides API for the ngModel directive. The controller contains services for:
+	data-binding, 
+	validation, 
+	CSS updates, 
+	value formatting,
+	parsing. 
+
+It purposefully does not contain any logic which deals with DOM rendering or listening to DOM events. Such DOM related logic should be provided by other directives which make use of NgModelController for data-binding to control elements. AngularJS provides this DOM logic for most input elements. 
+
+
+Methods
+-----------
+$render(); $isEmpty(value); $setPristine(); $setDirty(); $setUntouched();
+$setTouched();$rollbackViewValue()$validate();$commitViewValue();$setViewValue(value, trigger);$overrideModelOption(options);$processModelValue();$setValidity(validationErrorKey, isValid);
+
+Properties
+----------
+$viewValue, $modelValue, $parsers, $formatters, $validators, $asyncValidators, $viewChangeListeners, $error, $pending, $untouched, $touched, $pristine, $dirty, $valid, $invalid, $name

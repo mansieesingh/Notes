@@ -1,0 +1,106 @@
+
+>> When we define a function inside a class then we don't need the function key word. 
+	Function defined within the class is called a 'METHOD' in that class.
+
+	class Logger {
+		logMessage(message) {
+			console.log(message);
+		}
+	};
+
+>> extends keyword : comes in ES6
+
+Class Example (with 'this' and 'static' keywords)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class Shapes {
+   	 logShape(){
+       	 console.log(this); //this refers to class
+   	 }
+	 static staticLogFunc(){
+       	 console.log("This funciton used static keyword");
+    	}
+}
+Shapes.staticLogFunc();
+const  myShape = new Shapes();
+myShape.logShape();
+
+
+Static Methods
+==============
+The static keyword defines a static method for a class. Static methods are called without instantiating their class and cannot be called through a class instance. Static methods are often used to create utility functions for an application.
+
+
+Constructor
+===============
+The constructor method is a special method for creating and initializing an object created with a class. There can only be one special method with the name "constructor" in a class. A SyntaxError will be thrown if the class contains more than one occurrence of a constructor method.
+
+***If there is a constructor present in the subclass, it needs to first call super() before using "this".***
+
+Example:
+~~~~~~~
+_____________________________________________________________________________
+|	class Rectangle {
+|	  constructor(height, width) {
+|	   this.height = height;
+|		    this.width = width;
+|	  }
+|	  // Getter
+|	  get area() {
+|	    return this.calcArea();
+|	  }
+|	  // Method
+|	  calcArea() {
+| 	   return this.height * this.width;
+| 	 }
+|		}
+|	const square = new Rectangle(10, 10);
+|	console.log(square.area); // 100
+|_____________________________________________________________________________
+
+Call Parent (base) class method from Child(derived) class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+User super keyword to call parent class method from child class.
+syntax: super.<func_name()>;
+
+______________________________________________________________________________
+| class Shapes {
+|	logShapes(){
+|		console.log("Hi! I am in Shapes class");
+|	}
+|}
+|
+|class Rectangle extends Shapes{
+|	logRectangle(){	super.logShapes(); }
+|	
+|}
+|
+|	const  myRectangle= new Rectangle();
+|	myRectangle.logRectangle();
+|____________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

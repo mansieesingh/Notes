@@ -1,0 +1,378 @@
+
+****Essentials****
+
+Inside <head> tag :  <script src="//code.angularjs.org/snapshot/angular.min.js"></script>
+Inside <body> tag : <script> </script>
+
+example:
+
+__________________________________________________________________________________________
+| <!DOCTYPE html>
+| <html>
+| <head>
+| 	<script src="//code.angularjs.org/snapshot/angular.min.js" </script>
+|</head>
+|
+|<body ng-app="myApp">
+|	<script>
+| 		angular.module('myApp', [])
+|		.controller('myCtrl', ['$scope', function($scope) {
+|		$scope.list= [];
+|		$scope.text = 'hello';
+|		$scope.submit = function() {
+|		if($scope.text) {
+|			$scope.list.push($scope.text)
+|		}
+|		};
+|		}]);
+|	</script>
+|
+|	<form ng-submit="submit()" ng-controller="myCtrl" >
+|		 Enter text and hit enter:
+|		<input type="text" ng-model="text" name="text">
+|		<input type="submit" value="Submit" id="submit">
+|		<pre> list= {{list}}</pre>
+|	</form>
+|</body>
+|</html>
+|_____________________________________________________________________________________________
+
+	
+ Enter text and hit enter: |_________________  |Submit|
+ list: ["hello"]
+
+
+How does the digest phase work?
+********************************
+In a nutshel, on every digest cycle all scope models are compares against their previous values. This is dirty checking. If change is detected, the watches set on that model are fired. Then another digest cycle executes and so on untill all models are stable.
+
+It is probably important to mention that there is no “.$digest()” polling. That means that every time it is being called deliberately. As long as core directives are used, we don’t need to worry, but when external code changes models the digest cycle needs to be called manually. Usually to do that, “.$apply()” or similar is used, and not “.$digest()” directly.
+
+What is $rootScope and how does it relate to $scope?
+**************************************************
+$rootScope is the parent object of all $scope Angular objects created in a web page.
+
+What are the DOM and the BOM?
+*****************************
+The DOM is the Document Object Model. It’s the view part of the UI. Whatever we are changing in page elements is reflected in the DOM.
+
+BOM is the Browser Object Model, which specificies the global browser objects like window, localstorage, and console.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+What Is The Difference Between $Scope And Scope?
+************************************************
+Scopes provide APIs ($watch) to observe model mutations.
+
+Scopes provide APIs ($apply) to propagate any model changes through the system into the view from outside of the "AngularJS realm" (controllers, services, AngularJS event handlers).
+
+Scopes can be nested to limit access to the properties of application components while providing access to shared model properties. Nested scopes are either "child scopes" or "isolate scopes". A "child scope" (prototypically) inherits properties from its parent scope. An "isolate scope" does not. See isolated scopes for more information.
+
+$scope 		: is the glue between application controller and the view.
+---------------
+scope property 	:
+--------------- 
+The scope property can be false, true, or an object:
+
+1> false (default): No scope will be created for the directive. The directive will use its parent's scope.
+
+2> true: A new child scope that prototypically inherits from its parent will be created for the directive's element. If multiple directives on the same element request a new scope, only one new scope is created.
+
+3> {...} (an object hash): A new "isolate" scope is created for the directive's template. The 'isolate' scope differs from normal scope in that it does not prototypically inherit from its parent scope. This is useful when creating reusable components, which should not accidentally read or modify data in the parent scope. Note that an isolate scope directive without a template or templateUrl will not apply the isolate scope to its children elements.
+
+------------------------------------------------------------------
+!!!!!!!!!!!!!!!!!!! example for scope property !!!!!!!!!!!!!!!!!!!
+------------------------------------------------------------------
+
+1- index.html
+2- script.js
+3- my-customer-ios.html
+
+index.html
+==========
+<div ng-controller = 'myController' >
+	<my-customer info='naomi' > </my-customer>
+	<my-customer info='igor' > </my-customer>
+</div>
+
+
+script.js
+=========
+angular.module('myApp', [])
+.controller ('myController', [ '$scope', function ( $scope ) {
+	$scope.naomi = { name: 'Naomi', address: '1600 Amphitheater'};
+	$scope.igor = { name: 'Igor', address: '1800 Amphitheater'};
+	}])
+.directive ('myCustomer', function () {
+	return {
+		restrict: 'E',
+		scope: { customerInfo: '=info'}, //this is isolation scope definition
+		templateUrl: 'my-cutomer-iso.html',
+		// template: 'Name: {{customer.name}} Address: {{customer.address}}' // provideing template inline
+	};
+});
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+??? How this (above isolation scope definition)  works ???
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+= or =attr - set up a bidirectional binding between a local scope property and an expression passed via the attribute attr. The expression is evaluated in the context of the parent scope. 
+
+Given <my-component my-attr="parentModel"> and the isolate scope definition scope: { localModel: '=myAttr' }, the property localModel on the directive's scope will reflect the value of parentModel on the parent scope. Changes to parentModel will be reflected in localModel and vice versa. If the binding expression is non-assignable, or if the attribute isn't optional and doesn't exist, an exception ($compile:nonassign) will be thrown upon discovering changes to the local value, since it will be impossible to sync them back to the parent scope.
+
+
+my-customer-iso.html
+====================
+Name: {{ customerInfo.name }} Address: {{ customerInfo.address }}
+	
+
+What are Directives?
+********************
+At a high level, directives are markers on a DOM element (such as an attribute, element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element (e.g. via event listeners), or even to transform the DOM element and its children.
+
+AngularJS comes with a set of these directives built-in, like ngBind, ngModel, and ngClass. Much like you create controllers and services, you can create your own directives for AngularJS to use. When AngularJS bootstraps your application, the HTML compiler traverses the DOM matching directives against the DOM elements.
+
+What does it mean to "compile" an HTML template? For AngularJS, "compilation" means attaching directives to the HTML to make it interactive. The reason we use the term "compile" is that the recursive process of attaching directives mirrors the process of compiling source code in compiled programming languages.
+
+
+What Are Different Ways To Invoke A Directive?
+**********************************************
+There are four different ways to invoke a directive in an angular application. They are as follows.
+
+	1) As an attribute:
+		<span my-directive></span>
+
+	2) As a class:
+		<span class="my-directive: expression;"></span>
+
+	3) As an element:
+		<my-directive></my-directive>
+
+	4) As a comment:
+		<!-- directive: my-directive expression -->
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Creating Directives
+================
+First let's talk about the API for registering directives. Much like controllers, directives are registered on modules. To register a directive, you use the module.directive API. module.directive takes the normalized directive name followed by a factory function. This factory function should return an object with the different options to tell $compile how the directive should behave when matched.
+
+The factory function is invoked only once when the compiler matches the directive for the first time. You can perform any initialization work here. The function is invoked using $injector.invoke which makes it injectable just like a controller.
+
+
+angular.module('myApp', [])
+.controlller('myController', [$scope, function($scope) {
+
+$scope.customer = {
+	name: "Jone",
+	address: "1600 downtown"
+};
+}])
+
+.directive('myCustomer', function() {
+ 	return {
+		restrict: 'E'
+		template: 'Name: {{customer.name}} Address: {{customer.address}}
+	};
+});
+
+<div ng-controller="myController">
+	<my-customer></my-customer>
+</div>
+
+output:
+======
+
+Name: Jone Address: 1600 downtown
+
+------------------------------------------------------------------------------
+FILTERS:
+*******
+Can be used in: 
+	1. View template
+	2. Controllers, Services and Directives
+
+
+***************
+In VIew Template
+***************
+
+Filters can be applied to expressions:  {{ expression | filter }}
+e.g. 	 {{ 2 | currency }}   =>  $2.00 ==>  formats the number 12 as a currency
+	{{ 1234 | number:2 }} => 1234.00   ==>  formats the number 1234 with 2 decimal points	
+
+
+
+*********************************
+In Controllers, Services and Directives
+*********************************
+
+For this, inject a dependency with the name <filterName>Filter into your controller/service/directive. E.g. a filter called number is injected by using the dependency numberFilter. The injected argument is a function that takes the value to format as first argument, and filter parameters starting with the second argument.
+
+script.js
+*******
+angular.module('myApp',[]) 
+.controller ('myController', [ 'filterFilter' function ( filterFilter ) {
+	this.array = [ 
+	{ name : 'John'},
+	{ name : 'Jane'},
+	{ name : 'Merry'},
+	{ name : 'James'},
+	{ name : 'Jeff'}
+ 	];
+
+this.filteredArray = filterFilter (this.array , 'a' );
+ }]);
+
+index.html
+**********
+<div ng-controller = "myController as ctrl">
+	<div>
+	All entries :
+	<span ng-repeat ="entry in ctrl.array" > {{ entry.name }} </span>
+	<div>
+
+	<div>
+	Entries that contain an 'a' :
+	<span ng-repeat="entry in ctrl.filteredArray > {{entry.name }} </span>
+	<div>
+</div>
+
+output:
+******
+All entries: Tobias Jeff Brian Igor James Brad
+Entries that contain an "a": Tobias Brian James Brad
+
+
+
+Creating Filter
+============
+
+Writing your own filter is very easy: 
+	1> just register a new filter factory function with your module. Internally, this uses the filterProvider. 
+	2> This factory function should return a new filter function which takes the input value as the first argument. Any filter arguments are passed in as additional arguments to the filter function.
+
+filter is someting like,  
+
+		|=========fn===========|
+ ----input---->	| [ process the input ]|---output---->.
+		|======================|
+
+Therefore, filte is nothing but a function which takes some input and returns output. 
+Difference from normal function is that ===> 
+	1> it is registered with the module ===> with 
+	2> to be used, it has to be  injected into a controller ===>  by adding suffix (Filter)
+
+
+script.js
+*******
+angular.module('myApp',[])
+.filter ('reverse', function() {
+		return function (input, uppercase) {
+		input = input || ' ';
+		var out =' ';
+	
+			for(i=0; i<input.length; i++) {
+			out = input.charAt(i) + out;
+			}
+	
+			if(uppercase){
+			out = out.toUpperCase();
+				} 
+			return out;
+			};
+})
+.controller('myController', [$scope, 'reverseFilter', function ( $scope, reverseFilter) {
+	$scope.greeting = 'hello';
+	$scope.filteredgreeting = reverseFilter(greeting);
+}]);
+
+index.html
+*********
+<div ng-controller='myController'>
+	<input ng-model = 'greeting' type ='text' > <br>
+	No filter : {{ greeting }} <br>
+	Reverse : {{ greeting | reverse }} <br> 
+	Reverse + uppercase : {{ greeting | reverse : true }} <br> 
+	Reverse, filtered in controller: {{filererdgreeting }} <br>
+	
+	
+output
+******
+No filter: hello
+Reverse: olleh
+Reverse + uppercase: OLLEH
+Reverse, filtered in controller: olleh
+
+
+
+------------------------------------------------------------------------------
+
+Normalization
+============
+AngularJS normalizes an element's tag and attribute name to determine which elements match which directives. We typically refer to directives by their case-sensitive camelCase normalized name (e.g. ngModel). However, since HTML is case-insensitive, we refer to directives in the DOM by lower-case forms, typically using dash-delimited attributes on DOM elements (e.g. ng-model).
+
+The normalization process is as follows:
+
+Strip x- and data- from the front of the element/attributes.
+Convert the :, -, or _-delimited name to camelCase.
+For example, the following forms are all equivalent and match the ngBind directive:
+
+
+script.js
+----------
+angular.module('docsBindExample', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.name = 'Max Karl Ernst Ludwig Planck (April 23, 1858 – October 4, 1947)';
+}]);
+
+index.html
+--------------
+<div ng-controller="Controller">
+  Hello <input ng-model='name'> <hr/>
+  <span ng-bind="name"></span> <br/>
+  <span ng:bind="name"></span> <br/>
+  <span ng_bind="name"></span> <br/>
+  <span data-ng-bind="name"></span> <br/>
+  <span x-ng-bind="name"></span> <br/>
+</div>
+
+
+output:
+--------
+Hello |Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947)|
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947)
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947) 
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947) 
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947) 
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947) 
+Max Karl st Ludwig Planck (April 23, 1858 – October 4, 1947) 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ngModel.NgModelController
+******************************
+
+Overview
+NgModelController provides API for the ngModel directive. The controller contains services for:
+	data-binding, 
+	validation, 
+	CSS updates, 
+	value formatting,
+	parsing. 
+
+It purposefully does not contain any logic which deals with DOM rendering or listening to DOM events. Such DOM related logic should be provided by other directives which make use of NgModelController for data-binding to control elements. AngularJS provides this DOM logic for most input elements. 
+
+
+Methods
+-----------
+$render(); $isEmpty(value); $setPristine(); $setDirty(); $setUntouched();
+$setTouched();$rollbackViewValue()$validate();$commitViewValue();$setViewValue(value, trigger);$overrideModelOption(options);$processModelValue();$setValidity(validationErrorKey, isValid);
+
+Properties
+----------
+$viewValue, $modelValue, $parsers, $formatters, $validators, $asyncValidators, $viewChangeListeners, $error, $pending, $untouched, $touched, $pristine, $dirty, $valid, $invalid, $name
+
+
+
